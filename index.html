@@ -9,11 +9,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PBX07L572J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-PBX07L572J');
+</script>
 </head>
 <body>
   <header class="site-header" data-header>
     <a class="brand" href="#inicio" aria-label="Norüm Estudio inicio">
-      <span class="brand-mark">N</span>
+      <span class="brand-mark" aria-hidden="true">
+        <img class="brand-mark-image brand-mark-image-light" src="assets/img/Icono pequeño Blanco.png" alt="">
+        <img class="brand-mark-image brand-mark-image-dark" src="assets/img/Icono pequeño negro.png" alt="">
+      </span>
       <span>Norüm Estudio</span>
     </a>
 
@@ -47,8 +59,11 @@
         <div class="visual-frame">
           <div class="wood-panel"></div>
           <div class="cabinet-card">
-            <span>Cocinas</span>
-            <strong>A medida</strong>
+            <div class="cabinet-card-copy">
+              <span>Cocinas</span>
+              <strong>A medida</strong>
+            </div>
+            <img class="cabinet-card-logo" src="assets/img/Norum Negro.png" alt="Norüm Estudio">
           </div>
         </div>
       </div>
