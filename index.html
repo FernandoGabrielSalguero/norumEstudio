@@ -273,22 +273,22 @@
         </ul>
       </div>
 
-      <form class="contact-form reveal" data-contact-form>
+      <form class="contact-form reveal" id="contactForm">
         <label>
           Nombre
-          <input type="text" name="name" placeholder="Tu nombre" required>
+          <input type="text" name="contact_nombre" placeholder="Tu nombre" required>
         </label>
         <label>
           Email
-          <input type="email" name="email" placeholder="tu@email.com" required>
+          <input type="email" name="contact_email" placeholder="tu@email.com" required>
         </label>
         <label>
           Teléfono
-          <input type="tel" name="phone" placeholder="+54 9 11 4199 3809">
+          <input type="tel" name="contact_whatsapp" placeholder="+54 9 11 4199 3809">
         </label>
         <label>
           Tipo de proyecto
-          <select name="project" required>
+          <select name="contact_description" required>
             <option value="">Seleccionar</option>
             <option>Cocina a medida</option>
             <option>Vestidor o placard</option>
@@ -299,10 +299,10 @@
         </label>
         <label>
           Mensaje
-          <textarea name="message" rows="5" placeholder="Contanos medidas aproximadas, ubicación y necesidades principales" required></textarea>
+          <textarea name="contact_consultation" rows="5" placeholder="Contanos medidas aproximadas, ubicación y necesidades principales" required></textarea>
         </label>
         <button class="button primary" type="submit">Enviar consulta</button>
-        <p class="form-note" data-form-note>El mensaje será contestado a la brevedad</p>
+        <p class="form-note" id="contactFormMessage" aria-live="polite">El mensaje será contestado a la brevedad</p>
       </form>
     </section>
   </main>
@@ -320,6 +320,7 @@
     <span>WhatsApp</span>
   </a>
 
-  <script src="js/main.js?v=contact-api-20260418b"></script>
+  <script src="js/main.js?v=contact-api-20260418c"></script>
+  <script src="js/contact-form-api.js?v=contact-api-20260418c"></script>
 </body>
 </html>

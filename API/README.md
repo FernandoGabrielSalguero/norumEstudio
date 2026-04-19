@@ -1,50 +1,61 @@
-# API Contact Form Landing Page
+# Integracion API Contact Form Landing Page
 
-API PHP para recibir contactos desde landings y guardarlos en la tabla `forms_clients_contact`.
+Este documento esta escrito para implementar esta API en otras landings HTML/CSS/JS sin volver a decidir la arquitectura.
 
-Esta API solo permite una accion: guardar contactos en la base de datos.
+La API central recibe datos de formularios de contacto y guarda registros en la tabla `forms_clients_contact`.
 
-## Archivos
+## Decision por defecto
 
-- `index.php`: endpoint principal de la API.
-- `allowed-domains.txt`: listado de dominios permitidos para llamar a la API desde el navegador.
+Para produccion, usar siempre la integracion con PHP intermedio:
 
-## 1. Tabla de base de datos
-
-La API guarda datos en la tabla `forms_clients_contact`. La tabla debe existir en MySQL/MariaDB con esta estructura:
-
-```sql
-CREATE TABLE forms_clients_contact (
-  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  page VARCHAR(150) NOT NULL,
-  contact_nombre VARCHAR(150) NOT NULL,
-  contact_whatsapp VARCHAR(50) NULL,
-  contact_email VARCHAR(150) NULL,
-  contact_description TEXT NULL,
-  contact_consultation VARCHAR(255) NULL,
-  state ENUM('recibido', 'cancelado', 'aprobado') NOT NULL DEFAULT 'recibido',
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```text
+Formulario HTML de la landing
+  -> contact-submit.php en la landing
+  -> API central
+  -> Base de datos
 ```
 
-## 2. Configurar el `.env`
+Motivo: la `API_KEY` queda en servidor y no queda visible en JavaScript.
 
-La API carga variables desde el `.env` de la raiz del proyecto:
+Usar JavaScript directo solo para pruebas rapidas o si la landing no puede ejecutar PHP.
+
+## API central
+
+Endpoint:
+
+```text
+https://TU-DOMINIO-DE-LA-API.com/API/contact_form_landing_page/index.php
+```
+
+Ejemplos:
+
+```text
+https://impulsagroup.com/API/contact_form_landing_page/index.php
+https://norumestudio.com.ar/API/contact_form_landing_page/index.php
+```
+
+Validacion rapida:
+
+Abrir el endpoint en el navegador con metodo `GET`.
+
+Resultado esperado si el archivo existe:
+
+```json
+{
+  "status": "error",
+  "message": "Metodo no permitido. Usa POST."
+}
+```
+
+Si responde `404`, la API no esta publicada en esa ruta.
+
+## Configuracion de la API central
+
+La API lee variables desde el `.env` de la raiz del proyecto donde esta publicada:
 
 ```text
 .env
 ```
-
-Tambien puede cargar un `.env` local de esta carpeta si existe:
-
-```text
-API/contact_form_landing_page/.env
-```
-
-El `.env` local es opcional y sirve para sobrescribir valores especificos de esta API.
 
 Variables necesarias:
 
@@ -54,139 +65,479 @@ DB_PORT=3306
 DB_NAME=nombre_de_tu_base
 DB_USER=usuario_de_base
 DB_PASS=contrasena_de_base
-API_KEY=coloca_una_clave_larga_y_segura
+API_KEY=tu_api_key_larga_y_segura
 ```
 
-Notas:
-
-- `DB_PASS` guarda la password de la base de datos.
-- `API_KEY` es opcional, pero recomendado. Si tiene valor, la landing debe enviarlo en el header `X-API-Key`.
-- Los dominios permitidos ya no se cargan desde el `.env`; se cargan desde `allowed-domains.txt`.
-
-## 3. Configurar dominios permitidos
-
-Edita el archivo `allowed-domains.txt`.
-
-Formato recomendado:
+La API tambien lee dominios permitidos desde:
 
 ```text
-# Dominios permitidos para llamar a esta API desde el navegador.
-# Escribir un dominio por linea, siempre con https:// y sin barra final.
+API/contact_form_landing_page/allowed-domains.txt
+```
 
+Formato:
+
+```text
 https://norumestudio.com.ar
 https://www.norumestudio.com.ar
 https://impulsagroup.com
 https://www.impulsagroup.com
+http://localhost:5500
 ```
 
-Notas:
+Reglas:
 
-- Usa dominios sin barra final. Correcto: `https://norumestudio.com.ar`.
-- Evita poner rutas completas. No uses `https://norumestudio.com.ar/contacto`.
-- Para pruebas locales puedes agregar `http://localhost:3000` o el puerto que uses.
-- CORS controla llamadas desde navegador, pero no reemplaza la `API_KEY`.
+- Un dominio por linea.
+- Sin barra final.
+- No incluir paths.
+- Correcto: `https://norumestudio.com.ar`.
+- Incorrecto: `https://norumestudio.com.ar/`.
+- Incorrecto: `https://norumestudio.com.ar/contacto`.
 
-## 4. Endpoint
+## Campos de formulario
 
-```http
-POST /API/contact_form_landing_page/index.php
+La API espera JSON con estos campos:
+
+```json
+{
+  "page": "landing-norum",
+  "contact_nombre": "Juan Perez",
+  "contact_whatsapp": "+5491123456789",
+  "contact_email": "juan@email.com",
+  "contact_description": "Descripcion general",
+  "contact_consultation": "Consulta puntual"
+}
 ```
 
-El cuerpo debe enviarse como JSON.
+Obligatorios:
 
-## 5. Campos aceptados
+```text
+page
+contact_nombre
+```
 
-| Campo | Tipo | Obligatorio | Descripcion |
-| --- | --- | --- | --- |
-| `page` | texto, maximo 150 | Si | Nombre o identificador de la pagina/landing |
-| `contact_nombre` | texto, maximo 150 | Si | Nombre del contacto |
-| `contact_whatsapp` | texto, maximo 50 | No | Telefono o WhatsApp |
-| `contact_email` | texto, maximo 150 | No | Email del contacto |
-| `contact_description` | texto | No | Descripcion general |
-| `contact_consultation` | texto, maximo 255 | No | Consulta puntual del contacto |
+Opcionales:
 
-El campo `state` no se envia desde la landing. La API lo guarda automaticamente como `recibido`.
+```text
+contact_whatsapp
+contact_email
+contact_description
+contact_consultation
+```
 
-## 6. Ejemplo con JavaScript
+`state` no se envia desde la landing. La API lo guarda como `recibido`.
+
+## Implementacion recomendada para una nueva landing
+
+Crear estos archivos en el proyecto de la landing:
+
+```text
+contact-submit.php
+js/contact-form-api.js
+```
+
+Actualizar el formulario HTML para que tenga:
+
+```text
+id="contactForm"
+```
+
+Agregar un contenedor de mensajes:
+
+```text
+id="contactFormMessage"
+```
+
+Asegurar que los campos tengan estos `name`:
+
+```text
+contact_nombre
+contact_whatsapp
+contact_email
+contact_description
+contact_consultation
+```
+
+## HTML minimo esperado
+
+Usar este HTML como referencia. Si la landing ya tiene formulario, adaptar solo `id`, `name` y el script.
+
+```html
+<form id="contactForm">
+  <input type="text" name="contact_nombre" placeholder="Nombre" required>
+
+  <input type="tel" name="contact_whatsapp" placeholder="WhatsApp">
+
+  <input type="email" name="contact_email" placeholder="Email">
+
+  <textarea name="contact_description" placeholder="Descripcion"></textarea>
+
+  <textarea name="contact_consultation" placeholder="Consulta"></textarea>
+
+  <button type="submit">Enviar</button>
+
+  <p id="contactFormMessage" aria-live="polite"></p>
+</form>
+
+<script src="js/contact-form-api.js"></script>
+```
+
+## Archivo `contact-submit.php`
+
+Crear en la raiz de la landing:
+
+```text
+contact-submit.php
+```
+
+Contenido:
+
+```php
+<?php
+
+header('Content-Type: application/json; charset=utf-8');
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Metodo no permitido.',
+    ]);
+    exit;
+}
+
+$apiEndpoint = 'https://TU-DOMINIO-DE-LA-API.com/API/contact_form_landing_page/index.php';
+$apiKey = 'TU_API_KEY_DEL_ENV';
+
+$rawBody = file_get_contents('php://input');
+
+if ($rawBody === false || trim($rawBody) === '') {
+    http_response_code(422);
+    echo json_encode([
+        'status' => 'invalid',
+        'message' => 'El formulario esta vacio.',
+    ]);
+    exit;
+}
+
+$ch = curl_init($apiEndpoint);
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => [
+        'Content-Type: application/json',
+        'X-API-Key: ' . $apiKey,
+    ],
+    CURLOPT_POSTFIELDS => $rawBody,
+    CURLOPT_TIMEOUT => 15,
+]);
+
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curlError = curl_error($ch);
+curl_close($ch);
+
+if ($response === false || $response === '') {
+    http_response_code(502);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'No se pudo conectar con la API.',
+        'detail' => $curlError,
+    ]);
+    exit;
+}
+
+http_response_code($httpCode ?: 502);
+echo $response;
+```
+
+Reemplazar:
+
+```php
+$apiEndpoint = 'https://TU-DOMINIO-DE-LA-API.com/API/contact_form_landing_page/index.php';
+$apiKey = 'TU_API_KEY_DEL_ENV';
+```
+
+Por los valores reales de la API central.
+
+## Archivo `js/contact-form-api.js`
+
+Crear:
+
+```text
+js/contact-form-api.js
+```
+
+Contenido:
 
 ```js
-const response = await fetch('https://tudominio.com/API/contact_form_landing_page/index.php', {
+const CONTACT_API_ENDPOINT = '/contact-submit.php';
+const CONTACT_PAGE_NAME = 'NOMBRE_UNICO_DE_LA_LANDING';
+
+const contactForm = document.querySelector('#contactForm');
+const contactFormMessage = document.querySelector('#contactFormMessage');
+
+if (contactForm) {
+  contactForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    const submitButton = contactForm.querySelector('button[type="submit"]');
+    const formData = new FormData(contactForm);
+
+    const payload = {
+      page: CONTACT_PAGE_NAME,
+      contact_nombre: formData.get('contact_nombre') || '',
+      contact_whatsapp: formData.get('contact_whatsapp') || '',
+      contact_email: formData.get('contact_email') || '',
+      contact_description: formData.get('contact_description') || '',
+      contact_consultation: formData.get('contact_consultation') || ''
+    };
+
+    if (submitButton) {
+      submitButton.disabled = true;
+    }
+
+    if (contactFormMessage) {
+      contactFormMessage.textContent = 'Enviando...';
+    }
+
+    try {
+      const response = await fetch(CONTACT_API_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'No se pudo enviar el formulario.');
+      }
+
+      contactForm.reset();
+
+      if (contactFormMessage) {
+        contactFormMessage.textContent = 'Gracias. Recibimos tu consulta.';
+      }
+    } catch (error) {
+      if (contactFormMessage) {
+        contactFormMessage.textContent = error.message || 'No se pudo enviar el formulario.';
+      }
+
+      console.error('Error enviando formulario:', error);
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+      }
+    }
+  });
+}
+```
+
+Reemplazar:
+
+```js
+const CONTACT_PAGE_NAME = 'NOMBRE_UNICO_DE_LA_LANDING';
+```
+
+Por un identificador claro, por ejemplo:
+
+```js
+const CONTACT_PAGE_NAME = 'norum-home';
+```
+
+## Integracion alternativa: JavaScript directo
+
+Usar solo para pruebas rapidas o si no se puede crear PHP en la landing.
+
+Desventaja: la `API_KEY` queda visible en el navegador.
+
+```js
+const CONTACT_API_ENDPOINT = 'https://TU-DOMINIO-DE-LA-API.com/API/contact_form_landing_page/index.php';
+const CONTACT_API_KEY = 'TU_API_KEY_DEL_ENV';
+const CONTACT_PAGE_NAME = 'NOMBRE_UNICO_DE_LA_LANDING';
+
+const contactForm = document.querySelector('#contactForm');
+const contactFormMessage = document.querySelector('#contactFormMessage');
+
+if (contactForm) {
+  contactForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    const submitButton = contactForm.querySelector('button[type="submit"]');
+    const formData = new FormData(contactForm);
+
+    const payload = {
+      page: CONTACT_PAGE_NAME,
+      contact_nombre: formData.get('contact_nombre') || '',
+      contact_whatsapp: formData.get('contact_whatsapp') || '',
+      contact_email: formData.get('contact_email') || '',
+      contact_description: formData.get('contact_description') || '',
+      contact_consultation: formData.get('contact_consultation') || ''
+    };
+
+    if (submitButton) {
+      submitButton.disabled = true;
+    }
+
+    if (contactFormMessage) {
+      contactFormMessage.textContent = 'Enviando...';
+    }
+
+    try {
+      const response = await fetch(CONTACT_API_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': CONTACT_API_KEY
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'No se pudo enviar el formulario.');
+      }
+
+      contactForm.reset();
+
+      if (contactFormMessage) {
+        contactFormMessage.textContent = 'Gracias. Recibimos tu consulta.';
+      }
+    } catch (error) {
+      if (contactFormMessage) {
+        contactFormMessage.textContent = error.message || 'No se pudo enviar el formulario.';
+      }
+
+      console.error('Error enviando formulario:', error);
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+      }
+    }
+  });
+}
+```
+
+## Checklist de implementacion
+
+- [ ] Confirmar URL real de la API central.
+- [ ] Abrir la URL de la API en navegador y verificar que no responda `404`.
+- [ ] Confirmar que la tabla `forms_clients_contact` existe.
+- [ ] Confirmar que el `.env` de la API tiene `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS` y `API_KEY`.
+- [ ] Agregar el dominio de la landing en `allowed-domains.txt`.
+- [ ] Crear `contact-submit.php` en la landing.
+- [ ] Crear `js/contact-form-api.js` en la landing.
+- [ ] Agregar `<script src="js/contact-form-api.js"></script>` en el HTML.
+- [ ] Confirmar que el formulario tiene `id="contactForm"`.
+- [ ] Confirmar que existe `id="contactFormMessage"`.
+- [ ] Confirmar que los campos tienen los `name` esperados.
+- [ ] Enviar una prueba desde la landing.
+- [ ] Confirmar que se creo un registro en `forms_clients_contact`.
+
+## Prueba desde consola del navegador
+
+Para probar la API central directamente:
+
+```js
+fetch('https://TU-DOMINIO-DE-LA-API.com/API/contact_form_landing_page/index.php', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'X-API-Key': 'coloca_aca_la_api_key_si_la_configuraste'
+    'X-API-Key': 'TU_API_KEY_DEL_ENV'
   },
   body: JSON.stringify({
-    page: 'landing-desarrollo-web',
-    contact_nombre: 'Juan Perez',
+    page: 'prueba-consola',
+    contact_nombre: 'Prueba API',
     contact_whatsapp: '+5491123456789',
-    contact_email: 'juan@email.com',
-    contact_description: 'Quiere consultar por una pagina web',
-    contact_consultation: 'Necesito una landing para mi negocio'
+    contact_email: 'test@test.com',
+    contact_description: 'Prueba desde consola',
+    contact_consultation: 'Consulta de prueba'
   })
-});
-
-const data = await response.json();
-console.log(data);
+})
+  .then(async response => {
+    const text = await response.text();
+    console.log(response.status, text);
+  })
+  .catch(console.error);
 ```
 
-## 7. Respuestas posibles
+Resultado correcto:
 
-Contacto guardado:
+```text
+201 {"status":"success","message":"Contacto guardado correctamente."}
+```
+
+## Diagnostico de errores
+
+### 404 Not Found
+
+El archivo de la API no esta publicado en esa ruta.
+
+Verificar:
+
+```text
+https://TU-DOMINIO-DE-LA-API.com/API/contact_form_landing_page/index.php
+```
+
+### 401 API key invalida
+
+La API key enviada no coincide con la del `.env`.
+
+Verificar en la API:
+
+```env
+API_KEY=tu_api_key_larga_y_segura
+```
+
+Verificar en `contact-submit.php`:
+
+```php
+$apiKey = 'tu_api_key_larga_y_segura';
+```
+
+### Error de CORS
+
+El dominio de la landing no esta en:
+
+```text
+API/contact_form_landing_page/allowed-domains.txt
+```
+
+Agregar el dominio exacto:
+
+```text
+https://norumestudio.com.ar
+https://www.norumestudio.com.ar
+```
+
+### 422 Datos invalidos
+
+Falta `page`, falta `contact_nombre` o algun dato tiene formato invalido.
+
+Minimo valido:
 
 ```json
 {
-  "status": "success",
-  "message": "Contacto guardado correctamente."
+  "page": "landing-norum",
+  "contact_nombre": "Juan Perez"
 }
 ```
 
-Datos invalidos:
+### 500 Error de base de datos
 
-```json
-{
-  "status": "invalid",
-  "message": "El campo page es obligatorio."
-}
-```
+Revisar:
 
-API key incorrecta:
+- Credenciales del `.env`.
+- Existencia de la tabla `forms_clients_contact`.
+- Nombres de columnas.
+- Permisos del usuario de base de datos para hacer `INSERT`.
 
-```json
-{
-  "status": "error",
-  "message": "API key invalida."
-}
-```
+## Notas de seguridad
 
-Metodo incorrecto:
-
-```json
-{
-  "status": "error",
-  "message": "Metodo no permitido. Usa POST."
-}
-```
-
-## 8. Prueba con curl
-
-```bash
-curl -X POST "https://tudominio.com/API/contact_form_landing_page/index.php" \
-  -H "Content-Type: application/json" \
-  -H "X-API-Key: coloca_aca_la_api_key_si_la_configuraste" \
-  -d '{
-    "page": "landing-desarrollo-web",
-    "contact_nombre": "Juan Perez",
-    "contact_whatsapp": "+5491123456789",
-    "contact_email": "juan@email.com",
-    "contact_description": "Quiere consultar por una pagina web",
-    "contact_consultation": "Necesito una landing para mi negocio"
-  }'
-```
-
-## 9. Seguridad
-
-- No subas el archivo `.env` al repositorio.
-- Usa una `API_KEY` larga y dificil de adivinar.
-- Configura `allowed-domains.txt` con los dominios reales de tus landings.
-- No coloques credenciales de base de datos en ninguna landing.
+- Nunca poner credenciales de base de datos en la landing.
+- Para produccion, evitar JavaScript directo con `API_KEY`.
+- Preferir `contact-submit.php` para mantener la `API_KEY` en servidor.
+- Mantener `allowed-domains.txt` con dominios reales.
