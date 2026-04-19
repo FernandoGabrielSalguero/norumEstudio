@@ -901,20 +901,56 @@ textarea:focus {
     z-index: 22;
   }
 
+  .site-header.nav-active {
+    z-index: 24;
+  }
+
+  .site-header.nav-active .brand-mark-image-light {
+    opacity: 0;
+  }
+
+  .site-header.nav-active .brand-mark-image-dark {
+    opacity: 1;
+  }
+
   .site-nav {
     position: fixed;
-    inset: 0;
+    top: 68px;
+    right: 0;
+    bottom: auto;
+    left: 0;
     z-index: 21;
     display: grid;
-    place-content: center;
-    gap: 26px;
+    align-content: start;
+    gap: 0;
+    padding: 22px clamp(18px, 5vw, 48px) 30px;
     color: var(--ink);
-    background: rgba(246, 240, 231, 0.96);
+    background: rgba(246, 240, 231, 0.98);
+    box-shadow: 0 22px 42px rgba(23, 20, 17, 0.14);
+    backdrop-filter: blur(18px);
     opacity: 0;
     pointer-events: none;
     transform: translateY(-10px);
     transition: opacity 180ms ease, transform 180ms ease;
     font-size: 1.1rem;
+  }
+
+  .site-nav a {
+    display: flex;
+    align-items: center;
+    min-height: 54px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .site-nav a::after {
+    display: none;
+  }
+
+  .site-nav .nav-cta {
+    justify-content: center;
+    min-height: 48px;
+    margin-top: 18px;
+    border: 1px solid var(--ink);
   }
 
   .site-nav.is-open {
@@ -984,6 +1020,10 @@ textarea:focus {
 @media (max-width: 620px) {
   .site-header {
     padding-inline: 16px;
+  }
+
+  .site-nav {
+    top: 62px;
   }
 
   .brand span:last-child {
