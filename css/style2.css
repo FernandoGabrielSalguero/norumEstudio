@@ -840,6 +840,18 @@ textarea:focus {
   font-size: 0.88rem;
 }
 
+.form-note[data-status="pending"] {
+  color: rgba(255, 250, 240, 0.86);
+}
+
+.form-note[data-status="success"] {
+  color: #a8e8b3;
+}
+
+.form-note[data-status="error"] {
+  color: #ffb3a8;
+}
+
 .site-footer {
   display: flex;
   justify-content: space-between;
