@@ -8,6 +8,11 @@ const formNote = document.querySelector('[data-form-note]');
 const contactApiUrl = '/API/contact_form_landing_page/index.php';
 const contactApiKey = window.NORUM_CONTACT_API_KEY || '';
 
+console.info('Norüm contact form API script loaded.', {
+  version: 'contact-api-20260418',
+  endpoint: contactApiUrl
+});
+
 function setHeaderState() {
   header.classList.toggle('is-scrolled', window.scrollY > 24);
 }
