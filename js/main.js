@@ -9,7 +9,7 @@ const contactApiUrl = '/API/contact_form_landing_page/index.php';
 const contactApiKey = window.NORUM_CONTACT_API_KEY || '';
 
 console.info('Norüm contact form API script loaded.', {
-  version: 'contact-api-20260418',
+  version: 'contact-api-20260418b',
   endpoint: contactApiUrl
 });
 
@@ -97,6 +97,20 @@ form.addEventListener('submit', async (event) => {
     });
     const responseText = await response.text();
     let responseData = null;
+
+    if (!response.ok) {
+      console.error('La API respondió con error HTTP.', {
+        status: response.status,
+        statusText: response.statusText,
+        responseText,
+        url: contactApiUrl,
+        payload
+      });
+
+      if (response.status === 404) {
+        throw new Error(`Endpoint no encontrado: ${contactApiUrl}`);
+      }
+    }
 
     try {
       responseData = responseText ? JSON.parse(responseText) : null;
