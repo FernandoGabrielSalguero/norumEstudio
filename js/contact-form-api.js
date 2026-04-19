@@ -19,6 +19,17 @@ function setContactMessage(message) {
 async function readJsonResponse(response) {
   const text = await response.text();
 
+  if (response.status === 404) {
+    console.error('No se encontro el archivo contact-submit.php en el servidor.', {
+      status: response.status,
+      statusText: response.statusText,
+      endpoint: CONTACT_API_ENDPOINT,
+      rawResponse: text
+    });
+
+    throw new Error('No se encontro contact-submit.php en el servidor.');
+  }
+
   if (!text) {
     return {
       data: null,
