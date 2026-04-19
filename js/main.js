@@ -7,6 +7,7 @@ const contactForm = document.querySelector('#contactForm');
 const contactFormMessage = document.querySelector('#contactFormMessage');
 
 const CONTACT_API_ENDPOINT = 'https://gestion.impulsagroup.com/API/contact_form_landing_page/index.php';
+const VISIT_API_ENDPOINT = 'https://gestion.impulsagroup.com/API/visit_user_page/index.php';
 const CONTACT_API_KEY = 'ElS0l&laLuN@C@ntandoV4*laC1uD4d';
 const CONTACT_PAGE_NAME = 'norum-estudio';
 
@@ -63,6 +64,32 @@ document.querySelectorAll('main section[id]').forEach((section) => {
 
 setHeaderState();
 window.addEventListener('scroll', setHeaderState, { passive: true });
+
+async function registerPageVisit() {
+  try {
+    const response = await fetch(VISIT_API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': CONTACT_API_KEY
+      },
+      body: JSON.stringify({
+        page: CONTACT_PAGE_NAME
+      })
+    });
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error('Error registrando visita de pagina.', {
+        status: response.status,
+        statusText: response.statusText,
+        response: result
+      });
+    }
+  } catch (error) {
+    console.error('No se pudo registrar la visita de pagina.', error);
+  }
+}
 
 function setContactMessage(message, type = '') {
   if (!contactFormMessage) return;
@@ -167,3 +194,5 @@ if (contactForm) {
     }
   });
 }
+
+registerPageVisit();
