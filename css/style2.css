@@ -290,6 +290,12 @@ h3 {
   transform: translateY(-2px);
 }
 
+.button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+  transform: none;
+}
+
 .button.primary {
   color: var(--cream);
   background: var(--wood-dark);
