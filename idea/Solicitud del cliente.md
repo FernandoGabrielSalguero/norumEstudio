@@ -1,7 +1,7 @@
 1- Nombre comercial 
-Norüm Estudio 
+Norum Estudio 
 Breve descripción 
-Norüm Estudio es una marca de muebles a medida especializada en carpintería  premium, . 
+Norum Estudio es una marca de muebles a medida especializada en carpintería  premium, . 
 Diseñamos y fabricamos soluciones personalizadas para hogares y proyectos de 
 arquitectura, combinando estética contemporánea, materiales de alta calidad y atención 
 personalizada. 
@@ -12,7 +12,7 @@ Rubro o actividad principal
 ● Amoblamientos integrales 
 ● Proyectos personalizados 
 Objetivos del sitio web 
-● Presentar la marca Norüm Estudio 
+● Presentar la marca Norum Estudio 
 ● Mostrar trabajos realizados 
 ● Captar clientes de alto nivel 
 ● Recibir consultas 
@@ -31,7 +31,7 @@ Público objetivo
 
 2. Contenido institucional 
 Historia de la marca 
-Norhüm Studio nace con el objetivo de crear muebles a medida de alta calidad, pensados 
+Norhum Studio nace con el objetivo de crear muebles a medida de alta calidad, pensados 
 para quienes buscan diseño, funcionalidad y exclusividad. Inspirados en la estética 
 patagónica y el diseño contemporáneo, desarrollamos proyectos personalizados cuidando 
 cada detalle, desde la planificación hasta la instalación final. 
