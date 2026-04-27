@@ -430,6 +430,7 @@ h3 {
   height: 104px;
   object-fit: contain;
   object-position: center;
+  border: 1px solid var(--ink);
 }
 
 .intro-strip {
