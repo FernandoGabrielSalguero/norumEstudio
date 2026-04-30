@@ -67,10 +67,12 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
+  overflow-x: hidden;
   color: var(--ink);
   background:
     radial-gradient(circle at 12% 8%, rgba(154, 106, 67, 0.18), transparent 28rem),
@@ -103,6 +105,7 @@ a {
 img,
 svg {
   max-width: 100%;
+  display: block;
 }
 
 .site-header {
@@ -242,7 +245,7 @@ svg {
 }
 
 .hero {
-  min-height: 100vh;
+  min-height: 100svh;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(340px, 0.85fr);
   align-items: start;
@@ -286,7 +289,7 @@ h2 {
   font-family: var(--font-display);
   font-weight: 600;
   line-height: 0.94;
-  letter-spacing: -0.035em;
+  letter-spacing: 0;
 }
 
 h1 {
@@ -637,7 +640,7 @@ h3 {
   font-size: clamp(1.8rem, 3vw, 3.6rem);
   font-weight: 600;
   line-height: 0.98;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
 }
 
 .project-card:not(.large) h3 {
@@ -1077,11 +1080,26 @@ textarea:focus {
 
 @media (max-width: 620px) {
   .site-header {
-    padding-inline: 16px;
+    padding: 14px 16px;
   }
 
   .site-nav {
     top: 62px;
+  }
+
+  .brand {
+    gap: 10px;
+    font-size: 0.74rem;
+  }
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+  }
+
+  .nav-toggle {
+    width: 42px;
+    height: 42px;
   }
 
   .brand span:last-child {
@@ -1094,7 +1112,9 @@ textarea:focus {
   }
 
   h1 {
-    font-size: clamp(3.4rem, 18vw, 5rem);
+    font-size: 3.7rem;
+    line-height: 1;
+    letter-spacing: 0;
   }
 
   h2 {
@@ -1102,7 +1122,41 @@ textarea:focus {
   }
 
   .hero {
-    gap: 36px;
+    min-height: auto;
+    gap: 28px;
+    padding-top: 96px;
+    padding-bottom: 56px;
+  }
+
+  .hero-copy {
+    max-width: 100%;
+    padding-top: 0;
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+  }
+
+  .hero-text {
+    font-size: 1rem;
+  }
+
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .hero-actions .button {
+    width: 100%;
+  }
+
+  .button {
+    min-height: 48px;
+    padding: 13px 18px;
   }
 
   .visual-frame {
@@ -1149,6 +1203,33 @@ textarea:focus {
     min-height: 260px;
   }
 
+  .about-panel,
+  .about-copy {
+    padding: 48px 22px;
+  }
+
+  .about-panel h2 {
+    max-width: 100%;
+    font-size: clamp(2.35rem, 10.5vw, 3rem);
+    line-height: 1.04;
+    overflow-wrap: break-word;
+  }
+
+  .about-copy p {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .values {
+    gap: 8px;
+    margin-top: 26px;
+  }
+
+  .values span {
+    padding: 9px 12px;
+    font-size: 0.78rem;
+  }
+
   .site-footer {
     flex-direction: column;
   }
@@ -1167,5 +1248,44 @@ textarea:focus {
     overflow: hidden;
     clip: rect(0 0 0 0);
     white-space: nowrap;
+  }
+}
+
+@media (max-width: 400px) {
+  .site-header {
+    padding-inline: 14px;
+  }
+
+  .brand span:last-child {
+    max-width: 104px;
+  }
+
+  .section {
+    padding-inline: 14px;
+  }
+
+  h1 {
+    font-size: 3.15rem;
+  }
+
+  .hero {
+    padding-top: 90px;
+  }
+
+  .hero-actions {
+    max-width: 100%;
+  }
+
+  .about-panel,
+  .about-copy {
+    padding-inline: 20px;
+  }
+
+  .about-panel h2 {
+    font-size: 2.5rem;
+  }
+
+  .values span {
+    font-size: 0.74rem;
   }
 }
